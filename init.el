@@ -225,6 +225,8 @@
 
   (+general-global-menu! "magit" "g")
 
+  (+general-global-menu! "org" "m")
+
   (+general-global-menu! "help" "h"
     "d"   '(:ignore t :which-key "describe")
     "df"  'describe-function
@@ -374,6 +376,20 @@
       :pin org
       :commands (org-capture org-agenda)
       :hook (org-mode . efs/org-mode-setup)
+      :general
+    (+general-global-magit
+   "b"  'magit-branch
+   "B"  'magit-blame
+   "c"  'magit-clone
+   "f"  '(:ignore t :which-key "file")
+   "ff" 'magit-find-file
+   "fh" 'magit-log-buffer-file
+   "i"  'magit-init
+   "L"  'magit-list-repositories
+   "m"  'magit-dispatch
+   "S"  'magit-stage-file
+   "s"  'magit-status
+   "U"  'magit-unstage-file)
       :config
       (setq org-ellipsis " ▾")
 
@@ -827,16 +843,3 @@
 
 ;; Make gc pauses faster by decreasing the threshold.
 (setq gc-cons-threshold (* 2 1000 1000))
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(package-selected-packages
-   '(graphql-mode lsp-java restclient rainbow-mode yaml-mode ssh-config-mode web-beautify terraform-mode json-mode lua-mode dockerfile-mode editorconfig which-key vterm visual-fill-column use-package undo-fu typescript-mode rjsx-mode rainbow-delimiters pyvenv python-mode prettier-js org-bullets no-littering lsp-ui lsp-ivy ivy-rich ivy-prescient helpful general forge evil-nerd-commenter evil-collection eterm-256color eshell-git-prompt doom-themes doom-modeline dired-single dired-open dired-hide-dotfiles dap-mode counsel-projectile company-box command-log-mode auto-package-update all-the-icons-dired add-node-modules-path)))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
