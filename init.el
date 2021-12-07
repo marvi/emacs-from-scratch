@@ -10,6 +10,9 @@
 ;; Make frame transparency overridable
 (defvar efs/frame-transparency '(90 . 90))
 
+;; Replace yes/no with y/n when confirming stuff
+(defalias 'yes-or-no-p 'y-or-n-p)
+
 ;; The default is 800 kilobytes.  Measured in bytes.
 (setq gc-cons-threshold (* 50 1000 1000))
 
@@ -72,6 +75,9 @@
 ;; Set up the visible bell
 (setq visible-bell t)
 
+(setq frame-title-format
+    '("" invocation-name ": " (:eval (replace-regexp-in-string
+                                      "^ +" "" (buffer-name)))))
 (column-number-mode)
 (global-display-line-numbers-mode t)
 
@@ -527,6 +533,18 @@
 
 (add-hook 'org-mode-hook (lambda () (add-hook 'after-save-hook #'efs/org-babel-tangle-config)))
 
+(setq-default indent-tabs-mode nil) ;; No tabs
+
+(use-package editorconfig
+  :diminish "↹"
+  :init
+  (setq auto-mode-alist
+        (cl-union auto-mode-alist
+                  '(("\\.editorconfig\\'" . editorconfig-conf-mode)
+                    ("\\editorconfig\\'"  . editorconfig-conf-mode))))
+  :config
+  (editorconfig-mode 1))
+
 (defun efs/lsp-mode-setup ()
   (setq lsp-headerline-breadcrumb-segments '(path-up-to-project file symbols))
   (lsp-headerline-breadcrumb-mode))
@@ -568,11 +586,26 @@
     :prefix lsp-keymap-prefix
     "d" '(dap-hydra t :wk "debugger")))
 
-(use-package typescript-mode
-  :mode "\\.ts\\'"
-  :hook (typescript-mode . lsp-deferred)
+(use-package rjsx-mode
+  :mode ("\\.js\\'"
+         "\\.jsx\\'")
   :config
-  (setq typescript-indent-level 2))
+  (setq js2-mode-show-parse-errors nil
+        js2-mode-show-strict-warnings nil
+        js2-basic-offset 2
+        js-indent-level 2)
+  (setq-local flycheck-disabled-checkers (cl-union flycheck-disabled-checkers
+                                                   '(javascript-jshint))) ; jshint doesn't work for JSX
+  (electric-pair-mode 1))
+
+(use-package add-node-modules-path
+  :defer t
+  :hook (((js2-mode rjsx-mode) . add-node-modules-path)))
+
+(use-package prettier-js
+  :defer t
+  :diminish prettier-js-mode
+  :hook (((js2-mode rjsx-mode) . prettier-js-mode)))
 
 (use-package python-mode
   :ensure t
@@ -589,6 +622,69 @@
   :after python-mode
   :config
   (pyvenv-mode 1))
+
+(use-package dockerfile-mode
+  :mode "Dockerfile\\'")
+(use-package lua-mode
+  :defer t)
+(use-package json-mode
+  :defer t
+  :config
+  (setq js-indent-level 2))
+(use-package terraform-mode
+  :defer t)
+(use-package web-beautify
+  :defer t)
+(use-package ssh-config-mode
+  :defer t)
+(use-package yaml-mode
+  :mode "\\.yml\\'"
+  :config
+  (add-to-list 'write-file-functions 'delete-trailing-whitespace))
+(use-package css-mode
+  :ensure nil
+  :mode "\\.css\\'"
+  :config
+  (setq css-indent-offset 2)
+  (electric-pair-mode 1))
+(use-package rainbow-mode
+  :defer t
+  :diminish rainbow-mode
+  :init
+  (add-hook 'css-mode-hook 'rainbow-mode))
+(use-package shell-script-mode
+  :ensure nil
+  :defer t
+  :mode "\\.sh\\'"
+  :init
+  (setq sh-basic-offset 2
+        sh-indentation  2)
+  (setq auto-mode-alist
+        (cl-union auto-mode-alist
+                  '(("\\bash_profile\\'"  . shell-script-mode)
+                    ("\\.bash_profile\\'" . shell-script-mode)
+                    ("\\bashrc\\'"        . shell-script-mode)
+                    ("\\.bashrc\\'"       . shell-script-mode)
+                    ("\\inputrc\\'"       . shell-script-mode)
+                    ("\\.inputrc\\'"      . shell-script-mode)
+                    ("\\profile\\'"       . shell-script-mode)
+                    ("\\.profile\\'"      . shell-script-mode)
+                    ("\\sh_aliases\\'"    . shell-script-mode)
+                    ("\\.sh_aliases\\'"   . shell-script-mode)
+                    ("\\zprofile\\'"      . shell-script-mode)
+                    ("\\.zprofile\\'"     . shell-script-mode)
+                    ("\\zshrc\\'"         . shell-script-mode)
+                    ("\\.zshrc\\'"        . shell-script-mode))))
+  (electric-pair-mode 1))
+(use-package restclient
+  :mode (("\\.http\\'" . restclient-mode)))
+
+(use-package lsp-java
+  :defer t
+  :hook (((java-mode) . lsp)))
+
+(use-package graphql-mode
+  :defer t)
 
 (use-package company
   :after lsp-mode
@@ -731,3 +827,16 @@
 
 ;; Make gc pauses faster by decreasing the threshold.
 (setq gc-cons-threshold (* 2 1000 1000))
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(package-selected-packages
+   '(graphql-mode lsp-java restclient rainbow-mode yaml-mode ssh-config-mode web-beautify terraform-mode json-mode lua-mode dockerfile-mode editorconfig which-key vterm visual-fill-column use-package undo-fu typescript-mode rjsx-mode rainbow-delimiters pyvenv python-mode prettier-js org-bullets no-littering lsp-ui lsp-ivy ivy-rich ivy-prescient helpful general forge evil-nerd-commenter evil-collection eterm-256color eshell-git-prompt doom-themes doom-modeline dired-single dired-open dired-hide-dotfiles dap-mode counsel-projectile company-box command-log-mode auto-package-update all-the-icons-dired add-node-modules-path)))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
