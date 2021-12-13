@@ -1075,20 +1075,25 @@ We also use [[https://github.com/sebastiencs/company-box][company-box]] to furth
     :after (general)
     :general
     (+general-global-magit
-     "b"  'magit-branch
-     "B"  'magit-blame
-     "c"  'magit-clone
-     "f"  '(:ignore t :which-key "file")
-     "ff" 'magit-find-file
-     "fh" 'magit-log-buffer-file
-     "i"  'magit-init
-     "L"  'magit-list-repositories
-     "m"  'magit-dispatch
-     "S"  'magit-stage-file
-     "s"  'magit-status
-     "U"  'magit-unstage-file)
+      "b"  'magit-branch
+      "B"  'magit-blame
+      "c"  'magit-clone
+      "f"  '(:ignore t :which-key "file")
+      "ff" 'magit-find-file
+      "fh" 'magit-log-buffer-file
+      "i"  'magit-init
+      "L"  'magit-list-repositories
+      "m"  'magit-dispatch
+      "S"  'magit-stage-file
+      "s"  'magit-status
+      "U"  'magit-unstage-file)
     :custom
     (magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1))
+
+  (with-eval-after-load 'evil
+    (add-hook 'git-commit-mode-hook 'evil-insert-state)
+    (evil-set-initial-state 'magit-log-edit-mode 'insert))
+
 
 
 #+end_src
